@@ -12,6 +12,13 @@
 
 *******************************************************************************/
 
+export { Hash, hash, hashMulti, makeUTXOKey, hashFull, hashPart } from './modules/common/Hash';
+export { Scalar, Point } from './modules/common/ECC';
+export { Signature } from './modules/common/Signature';
+export { Sig, Pair, Schnorr, Message } from './modules/common/Schnorr';
+
+export { Utils, Endian } from './modules/utils/Utils';
+
 export {
     crypto_core_ed25519_BYTES,
     crypto_core_ed25519_UNIFORMBYTES,
