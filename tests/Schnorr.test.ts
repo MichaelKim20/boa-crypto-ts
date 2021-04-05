@@ -15,8 +15,10 @@ import * as crypto from "../lib";
 
 import * as assert from 'assert';
 
-describe ('Test of Schnorr', () =>
+describe ('Test of Schnorr', function ()
 {
+    this.timeout(3000);
+
     it ('Single signature', () =>
     {
         let kp: crypto.Pair  = crypto.Pair.random();
