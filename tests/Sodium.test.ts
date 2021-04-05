@@ -44,8 +44,10 @@ describe ('Test utility', () =>
     });
 });
 
-describe ('Test crypto_core', () =>
+describe ('Test crypto_core', function ()
 {
+    this.timeout(3000);
+
     let sample_random = [
         {
             random: '199d91ac71d6ae893ba9e9d267e9291fa3067f3d3099f3401f006a220ae245f2',
@@ -540,7 +542,7 @@ describe ('Test crypto_core', () =>
 
     it ('Test crypto_core_ed25519_random', () =>
     {
-        for (let i = 0; i < 10; i++)
+        for (let i = 0; i < 20; i++)
         {
             let p = crypto.crypto_core_ed25519_random();
             assert.ok(crypto.crypto_core_ed25519_is_valid_point(p));
