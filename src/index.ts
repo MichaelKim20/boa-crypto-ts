@@ -41,7 +41,4 @@ export {
     JSBIUtils
 } from './modules/sodium';
 
-import JSBI from 'jsbi';
-export { JSBI };
-
-export * as nacl from 'tweetnacl-ts';
+export { BOASodium } from './wrap/BOASodium';

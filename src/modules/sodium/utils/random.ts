@@ -11,9 +11,9 @@
 
 *******************************************************************************/
 
-import { randomBytes } from 'crypto';
+import * as nacl from 'tweetnacl-ts';
 
 export function randombytes_buf (n: number): Uint8Array
 {
-    return Uint8Array.from(randomBytes(n));
+    return nacl.randomBytes(n);
 }

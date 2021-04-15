@@ -58,7 +58,7 @@ export function crypto_scalarmult_ed25519_noclamp (n: Uint8Array, p: Uint8Array)
     return q;
 }
 
-export function crypto_scalarmult_ed25519_base (n: Uint8Array)
+export function crypto_scalarmult_ed25519_base (n: Uint8Array): Uint8Array
 {
     if (n.length != crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");
@@ -71,7 +71,7 @@ export function crypto_scalarmult_ed25519_base (n: Uint8Array)
     return q;
 }
 
-export function crypto_scalarmult_ed25519_base_noclamp (n: Uint8Array)
+export function crypto_scalarmult_ed25519_base_noclamp (n: Uint8Array): Uint8Array
 {
     if (n.length != crypto_core_ed25519_SCALARBYTES)
         throw new Error("Invalid input size");

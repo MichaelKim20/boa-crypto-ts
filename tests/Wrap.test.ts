@@ -12,42 +12,19 @@
 *******************************************************************************/
 
 import * as crypto from '../lib';
+import { IBOASodium } from "boa-sodium-base-ts";
 
 import * as assert from 'assert';
-import JSBI from 'jsbi';
-
-describe ('Test utility', () =>
-{
-    it ('Test of JSBIUtils.Sum', () =>
-    {
-        let sum = crypto.JSBIUtils.Sum(
-            [
-                JSBI.BigInt(2),
-                JSBI.BigInt(3),
-                JSBI.BigInt(4),
-                JSBI.BigInt(5)
-            ]);
-
-        assert.deepStrictEqual(sum, JSBI.BigInt(2+3+4+5));
-    });
-
-    it ('Test of JSBIUtils.SumMultiply', () =>
-    {
-        let sum = crypto.JSBIUtils.SumMultiply(
-            [
-                JSBI.BigInt(2),
-                JSBI.BigInt(3),
-                JSBI.BigInt(4),
-                JSBI.BigInt(5)
-            ]);
-
-        assert.deepStrictEqual(sum, JSBI.BigInt(2*3 + 4*5));
-    });
-});
 
 describe ('Test crypto_core', function()
 {
     this.timeout(6000);
+    let sodium: IBOASodium = new crypto.BOASodium();
+
+    before('Wait for the package libsodium to finish loading', () =>
+    {
+        return sodium.init();
+    });
 
     let sample_random = [
         {
@@ -545,8 +522,8 @@ describe ('Test crypto_core', function()
     {
         for (let i = 0; i < 20; i++)
         {
-            let p = crypto.crypto_core_ed25519_random();
-            assert.ok(crypto.crypto_core_ed25519_is_valid_point(p));
+            let p = sodium.crypto_core_ed25519_random();
+            assert.ok(sodium.crypto_core_ed25519_is_valid_point(p));
         }
     });
 
@@ -555,7 +532,7 @@ describe ('Test crypto_core', function()
         sample_random.forEach((m) =>
         {
             let random = Buffer.from(m.random, "hex");
-            let res = Buffer.from(crypto.crypto_core_ed25519_from_uniform(random));
+            let res = Buffer.from(sodium.crypto_core_ed25519_from_uniform(random));
             assert.deepStrictEqual(res.toString("hex"), m.crypto_core_ed25519_from_uniform);
         });
     });
@@ -566,7 +543,7 @@ describe ('Test crypto_core', function()
         {
             let p = Buffer.from(m.p, "hex");
             let q = Buffer.from(m.q, "hex");
-            let add = Buffer.from(crypto.crypto_core_ed25519_add(p, q));
+            let add = Buffer.from(sodium.crypto_core_ed25519_add(p, q));
             assert.deepStrictEqual(add.toString("hex"), m.add);
         });
     });
@@ -578,7 +555,7 @@ describe ('Test crypto_core', function()
         {
             let p = Buffer.from(m.p, "hex");
             let q = Buffer.from(m.q, "hex");
-            let sub = Buffer.from(crypto.crypto_core_ed25519_sub(p, q));
+            let sub = Buffer.from(sodium.crypto_core_ed25519_sub(p, q));
             assert.deepStrictEqual(sub.toString("hex"), m.sub);
         });
     });
@@ -586,13 +563,13 @@ describe ('Test crypto_core', function()
     it ('Test crypto_core_ed25519_is_valid_point', () =>
     {
         let valid = Buffer.from("ab4f6f6e85b8d0d38f5d5798a4bdc4dd444c8909c8a5389d3bb209a18610511b", "hex").reverse();
-        assert.ok(crypto.crypto_core_ed25519_is_valid_point(valid));
+        assert.ok(sodium.crypto_core_ed25519_is_valid_point(valid));
 
         let invalid = Buffer.from("ab4f6f6e85b8d0d38f5d5798a4bdc4dd444c8909c8a5389d3bb209a18610511c", "hex").reverse();
-        assert.ok(!crypto.crypto_core_ed25519_is_valid_point(invalid));
+        assert.ok(!sodium.crypto_core_ed25519_is_valid_point(invalid));
 
         let invalid2 = Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex").reverse();
-        assert.ok(!crypto.crypto_core_ed25519_is_valid_point(invalid2));
+        assert.ok(!sodium.crypto_core_ed25519_is_valid_point(invalid2));
     });
 
     it ('Test crypto_core_ed25519_scalar_reduce', () =>
@@ -600,7 +577,7 @@ describe ('Test crypto_core', function()
         sample_for_core_ed25519_scalar_reduce.forEach((elem) =>
         {
             let hash = Buffer.from(elem.hash, "hex");
-            let result = Buffer.from(crypto.crypto_core_ed25519_scalar_reduce(hash));
+            let result = Buffer.from(sodium.crypto_core_ed25519_scalar_reduce(hash));
             assert.deepStrictEqual(result.toString("hex"), elem.result);
         });
     });
@@ -611,7 +588,7 @@ describe ('Test crypto_core', function()
         {
             let x = Buffer.from(elem.x, "hex");
             let y = Buffer.from(elem.y, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_core_ed25519_scalar_add(x, y)).toString("hex"), elem.add);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_core_ed25519_scalar_add(x, y)).toString("hex"), elem.add);
         });
     });
 
@@ -621,7 +598,7 @@ describe ('Test crypto_core', function()
         {
             let x = Buffer.from(elem.x, "hex");
             let y = Buffer.from(elem.y, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_core_ed25519_scalar_sub(x, y)).toString("hex"), elem.sub);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_core_ed25519_scalar_sub(x, y)).toString("hex"), elem.sub);
         });
     });
 
@@ -631,7 +608,7 @@ describe ('Test crypto_core', function()
         {
             let x = Buffer.from(elem.x, "hex");
             let y = Buffer.from(elem.y, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_core_ed25519_scalar_mul(x, y)).toString("hex"), elem.mul);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_core_ed25519_scalar_mul(x, y)).toString("hex"), elem.mul);
         });
     });
 
@@ -640,7 +617,7 @@ describe ('Test crypto_core', function()
         sample_for_core_ed25519_scalar_xxxxx.forEach((elem) =>
         {
             let x = Buffer.from(elem.x, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_core_ed25519_scalar_negate(x)).toString("hex"), elem.negate_x);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_core_ed25519_scalar_negate(x)).toString("hex"), elem.negate_x);
         });
     });
 
@@ -649,7 +626,7 @@ describe ('Test crypto_core', function()
         sample_for_core_ed25519_scalar_xxxxx.forEach((elem) =>
         {
             let x = Buffer.from(elem.x, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_core_ed25519_scalar_invert(x)).toString("hex"), elem.invert_x);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_core_ed25519_scalar_invert(x)).toString("hex"), elem.invert_x);
         });
     });
 
@@ -658,13 +635,20 @@ describe ('Test crypto_core', function()
         sample_for_core_ed25519_scalar_xxxxx.forEach((elem) =>
         {
             let x = Buffer.from(elem.x, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_core_ed25519_scalar_complement(x)).toString("hex"), elem.complement_x);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_core_ed25519_scalar_complement(x)).toString("hex"), elem.complement_x);
         });
     });
 });
 
 describe ('Test crypto_scalarmult', function()
 {
+    let sodium: IBOASodium = new crypto.BOASodium();
+
+    before('Wait for the package libsodium to finish loading', () =>
+    {
+        return sodium.init();
+    });
+
     this.timeout(6000);
 
     let sample_for_scalarmult_ed25519 = [
@@ -755,7 +739,7 @@ describe ('Test crypto_scalarmult', function()
         sample_for_scalarmult_ed25519.forEach((elem) =>
         {
             let s = Buffer.from(elem.s, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_scalarmult_ed25519_base(s)).toString("hex"), elem.scalarmult_ed25519_base);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_scalarmult_ed25519_base(s)).toString("hex"), elem.scalarmult_ed25519_base);
         });
     });
 
@@ -764,7 +748,7 @@ describe ('Test crypto_scalarmult', function()
         sample_for_scalarmult_ed25519.forEach((elem) =>
         {
             let s = Buffer.from(elem.s, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_scalarmult_ed25519_base_noclamp(s)).toString("hex"), elem.scalarmult_ed25519_base_noclamp);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_scalarmult_ed25519_base_noclamp(s)).toString("hex"), elem.scalarmult_ed25519_base_noclamp);
         });
     });
 
@@ -774,7 +758,7 @@ describe ('Test crypto_scalarmult', function()
         {
             let s = Buffer.from(elem.s, "hex");
             let p = Buffer.from(elem.p, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_scalarmult_ed25519(s, p)).toString("hex"), elem.scalarmult_ed25519);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_scalarmult_ed25519(s, p)).toString("hex"), elem.scalarmult_ed25519);
         });
     });
 
@@ -784,7 +768,7 @@ describe ('Test crypto_scalarmult', function()
         {
             let s = Buffer.from(elem.s, "hex");
             let p = Buffer.from(elem.p, "hex");
-            assert.deepStrictEqual(Buffer.from(crypto.crypto_scalarmult_ed25519_noclamp(s, p)).toString("hex"), elem.scalarmult_ed25519_noclamp);
+            assert.deepStrictEqual(Buffer.from(sodium.crypto_scalarmult_ed25519_noclamp(s, p)).toString("hex"), elem.scalarmult_ed25519_noclamp);
         });
     });
 
@@ -792,16 +776,16 @@ describe ('Test crypto_scalarmult', function()
     {
         sample_for_scalarmult_ed25519.forEach((elem) =>
         {
-            assert.ok(crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from(elem.s, "hex")));
+            assert.ok(sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from(elem.s, "hex")));
         });
 
-        assert.ok(crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ec", "hex").reverse()));
-        assert.ok(crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("0eadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef", "hex").reverse()));
-        assert.ok(crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("0000000000000000000000000000000000000000000000000000000000000001", "hex").reverse()));
+        assert.ok(sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ec", "hex").reverse()));
+        assert.ok(sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("0eadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef", "hex").reverse()));
+        assert.ok(sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("0000000000000000000000000000000000000000000000000000000000000001", "hex").reverse()));
 
-        assert.ok(!crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex").reverse()));
-        assert.ok(!crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed", "hex").reverse()));
-        assert.ok(!crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef", "hex").reverse()));
-        assert.ok(!crypto.crypto_core_ed25519_is_valid_scalar(Buffer.from("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "hex").reverse()));
+        assert.ok(!sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("0000000000000000000000000000000000000000000000000000000000000000", "hex").reverse()));
+        assert.ok(!sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed", "hex").reverse()));
+        assert.ok(!sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef", "hex").reverse()));
+        assert.ok(!sodium.crypto_core_ed25519_is_valid_scalar(Buffer.from("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "hex").reverse()));
     });
 });
